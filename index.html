@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EKKE Tanulókártyák</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f4f5f7;
+    color: #202124;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 40px; }
+  header { margin-bottom: 20px; }
+  h1 { margin: 0 0 5px; font-size: 28px; }
+  .sub { color: #6b7280; margin: 0; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .modules { display: grid; gap: 12px; }
+  .module {
+    width: 100%; border: 0; border-radius: 16px; padding: 20px;
+    background: white; box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    text-align: left; cursor: pointer; font: inherit;
+  }
+  .module:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+  .module-title { font-weight: 700; font-size: 19px; }
+  .module-count { color: #737373; margin-top: 5px; }
+  .topbar {
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    margin-bottom: 16px;
+  }
+  button {
+    border: 0; border-radius: 10px; padding: 11px 15px;
+    font: inherit; cursor: pointer; user-select: none;
+  }
+  .back { background: #e5e7eb; }
+  .primary { background: #202124; color: white; }
+  .progress {
+    background: white; border-radius: 12px; padding: 12px 14px;
+    margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .bar { height: 8px; background: #e5e7eb; border-radius: 99px; overflow:hidden; margin-top:8px; }
+  .bar > div { height:100%; background:#202124; width:0%; transition:.2s; }
+  
+  /* 3D Kártya forgási effektek */
+  .card-container {
+    perspective: 1000px;
+    width: 100%;
+    min-height: 320px;
+    cursor: pointer;
+  }
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    text-align: center;
+    transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  .card-container.flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    background: white;
+    border-radius: 18px;
+    padding: 26px 22px;
+    box-shadow: 0 3px 14px rgba(0,0,0,.07);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .card-back {
+    transform: rotateY(180deg);
+    background: #fdfdfd;
+  }
+
+  .number { color:#777; font-size:14px; margin-bottom:14px; font-weight: 600; }
+  .question { font-size:21px; line-height:1.4; font-weight:700; }
+  .answer { font-size:18px; line-height:1.55; color: #111827; }
+  
+  /* Vezérlőgombok */
+  .nav-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .nav-controls button {
+    flex: 1;
+    padding: 14px;
+    font-weight: 600;
+  }
+  .btn-flip {
+    background: #3b82f6;
+    color: white;
+  }
+  .btn-nav {
+    background: #e5e7eb;
+    color: #1f2937;
+  }
+  .mark-area {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+  }
+  .btn-mark {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-mark.known {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
+  }
+
+  .study-controls { margin-top:14px; display:flex; gap:10px; }
+  .study-controls button { flex:1; }
+  .hint-text { font-size: 13px; color: #9ca3af; margin-top: 12px; text-align: center; }
+
+  @media (max-width:520px) {
+    h1 { font-size:24px; }
+    .question { font-size:19px; }
+    .answer { font-size:16px; }
+    .card-container, .card-inner, .card-front, .card-back { min-height:350px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>EKKE Tanulókártyák</h1>
+    <p class="sub">Sportszervező – egyszerű tanulófelület</p>
+  </header>
+
+  <section id="home" class="screen active">
+    <div class="modules" id="moduleList"></div>
+  </section>
+
+  <section id="module" class="screen">
+    <div class="topbar">
+      <button class="back" onclick="showHome()">← Tantárgyak</button>
+      <strong id="moduleTitle"></strong>
+    </div>
+    <div class="progress">
+      <div><strong id="moduleProgressText"></strong></div>
+      <div class="bar"><div id="moduleProgressBar"></div></div>
+    </div>
+    <div class="study-controls">
+      <button class="primary" onclick="startStudy(false)">▶ Tanulás sorban</button>
+      <button onclick="startStudy(true)">🔀 Keverés (Teszt)</button>
+    </div>
+    <div style="margin-top: 10px;">
+      <button onclick="resetModule()" style="width: 100%; background: transparent; color: #ef4444;">Haladás törlése</button>
+    </div>
+  </section>
+
+  <section id="study" class="screen">
+    <div class="topbar">
+      <button class="back" onclick="showModule()">← Vissza</button>
+      <span id="studyCounter" style="font-weight: bold;"></span>
+    </div>
+    <div class="progress">
+      <div><strong id="studyProgressText"></strong></div>
+      <div class="bar"><div id="studyProgressBar"></div></div>
+    </div>
+    
+    <!-- 3D Kártya Dobló elemek -->
+    <div class="card-container" id="cardContainer" onclick="toggleCardFlip()">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="number" id="cardNumber"></div>
+          <div class="question" id="question"></div>
+          <div class="hint-text">💡 Kattints a kártyára a megfordításhoz!</div>
+        </div>
+        <div class="card-back">
+          <div class="number">VÁLASZ</div>
+          <div class="answer" id="answer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Megjelölés megtanultként -->
+    <div class="mark-area">
+      <button id="markBtn" class="btn-mark" onclick="toggleMarkKnown()">
+        ☐ Megtanultként megjelöl
+      </button>
+    </div>
+
+    <!-- Navigációs gombok -->
+    <div class="nav-controls">
+      <button class="btn-nav" id="prevBtn" onclick="prevCard()">← Előző</button>
+      <button class="btn-flip" onclick="toggleCardFlip()">🔄 Megfordít</button>
+      <button class="btn-nav" id="nextBtn" onclick="nextCard()">Következő →</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const defaultModules = {
+  gimnasztika: {
+    title: "Gimnasztika",
+    cards: [
+      ["Mi a gimnasztika definíciója?", "Minden sportmozgás alapja. Tartalmazza az általánosan és sokoldalúan képző gyakorlatokat, a sportági mozgások előkészítő, szinten tartó és fejlesztő anyagát, valamint az ember természetes mozgásait."],
+      ["Mi a rajzírás lényege és fő jellemzője?", "A gimnasztikai gyakorlatok ábrázolásának legegyszerűbb módja pálcikaemberekkel. Nemzetközileg univerzális (a világ bármely pontján megértik)."],
+      ["Mi a szaknyelv szerepe?", "A sportszakember és a tanítványok közös nyelve (terminus technicusok) a pontos és egyértelmű kommunikációhoz."],
+      ["Melyek a gimnasztika fő céljai Hamar (2001) szerint?", "Mozgáskészség- és képességfejlesztés, egészséges testi fejlődés elősegítése, mozgáskultúra fejlesztése és a teljesítményfokozás."],
+      ["Miben különbözik az általánosan képző és a sportágspecifikus gimnasztika?", "Az általánosan képző sportágsemleges, sokoldalúan ható mozgásokat tartalmaz; a sportágspecifikus a sajátos sportági mozgások/képességek fejlesztését segíti."],
+      ["Melyik az az 5 fő támaszcsoport a gimnasztikában?", "Állások, Térdelések, Kéz- és lábtámaszok, Ülések, Fekvések."],
+      ["Mi a definíciója az Állásoknak és a Térdeléseknek?", "Állások: Támasz a talpon vagy annak valamelyik részén. Térdelések: Támasz a térden és a láb valamely részén."],
+      ["Mi a definíciója a Kéz- és lábtámaszoknak?", "Támasz egyenletesen megosztva a láb és a kar valamely részén."],
+      ["Mi a definíciója az Üléseknek és a Fekvéseknek?", "Ülések: Támasz az ülőgumón és a láb valamely részén. Fekvések: Támasz a test hasi, háti, bal vagy jobb oldalán."],
+      ["Mi a statikus alapforma?", "A gimnasztikai gyakorlatok legkisebb, tovább nem bontható egysége; minden stabil és könnyen végrehajtható kiindulóhelyzet (pl. guggolótámasz, terpeszállás)."],
+      ["Mi a dinamikus alapforma?", "Egy ízületben, egy forgástengely mentén végzett, külső vagy belső erő hatására létrejövő befejezett mozgás (pl. törzsdöntés előre)."],
+      ["Mi a különbség a határozott és határozatlan formájú gyakorlatok között?", "A határozott formájú gyakorlatoknál minden fázis (kiindulóhelyzet, irány, tempó stb.) szigorúan kötött; a határozatlan formájúnál a kivitelezést a tanítványra bízzuk (pl. természetes mozgások)."],
+      ["Melyek az ember természetes mozgásai?", "A törzsfejlődés során kialakult alapvető mozgások: járás, futás, ugrás, dobás, mászás stb."],
+      ["Milyen fázisai vannak egy határozott formájú gyakorlatnak?", "Kiindulóhelyzet, mozgás iránya és terjedelme, ismétlésszám, tempó és befejező helyzet."],
+      ["Hogyan csoportosítjuk a gyakorlatokat szerkezetük szerint?", "Helyzetváltoztatással járó és helyváltoztatással járó (járó) gyakorlatok."],
+      ["Mit jelent a ciklikus és aciklikus mozgás a gimnasztikában?", "Ciklikus: a mozgásfázisok folyamatosan és azonosan ismétlődnek (pl. járás). Aciklikus: egyedi, nem ismétlődő mozgássorozatok."],
+      ["Milyen csoportosítása van a gyakorlatoknak a testrészek foglalkoztatása alapján?", "Egyszerű (egy testrész) és összetett (több testrész egyidejű) gyakorlatok, valamint szimmetrikus és aszimmetrikus mozgások."],
+      ["Melyek a gimnasztika fő jellemzői?", "Sokoldalú, életkorhoz alakítható, egyénileg és csoportosan is végezhető, széles variációs és kombinációs lehetőségekkel bír."],
+      ["Melyek a gimnasztika fő színterei általános értelemben?", "Óvodai, köz- és felsőoktatási testnevelés, testnevelési bemutatók, valamint rekreációs/tömegsport rendezvények (Sport for All)."],
+      ["Melyek a gimnasztika színterei speciális hatásrendszer alapján?", "Élsporti felkészülés, fegyveres testületek/tűzoltók motorikus képzése, rehabilitáció és regeneráció."],
+      ["Milyen szerepet tölt be a gimnasztika a személyiségfejlesztésben?", "Fejleszti a fegyelmet, a kitartást, az önismeretet és a csapatmunkát."],
+      ["Milyen motoros alapképességeket fejleszt a gimnasztika?", "Erő, gyorsaság, állóképesség, ügyesség és hajlékonyság."],
+      ["Mi a különbség a törzsdöntés és a törzshajlítás között?", "A törzsdöntés egyenes háttal, csípőízületből történik; a törzshajlításnál a gerincoszlop ívben hajol meg."],
+      ["Mi a szerepe a rajzírásnak a gyakorlatvezetésben?", "Helytakarékos, gyors és vizuális áttekintést ad a komplett gyakorlatsorokról a pálcikafigurák segítségével."],
+      ["Hogyan segít a gimnasztika a cselekvéstanulási folyamatban?", "Előkészíti az ízületeket és izmokat, valamint kiépíti az új mozgásminták alapjait a bonyolultabb sportági technikák előtt."]
+    ]
+  }
+};
+
+let currentKey = null;
+let cardOrder = [];
+let currentIndex = 0;
+
+const $ = id => document.getElementById(id);
+const storageKey = key => "study_progress_" + key;
+
+function getProgress(key) {
+  try { return JSON.parse(localStorage.getItem(storageKey(key)) || "{}"); }
+  catch(e) { return {}; }
+}
+function saveProgress(key, p) {
+  localStorage.setItem(storageKey(key), JSON.stringify(p));
+}
+function progressStats(key) {
+  const p = getProgress(key);
+  const cards = defaultModules[key].cards;
+  let known = cards.filter((_,i) => p[i] === true).length;
+  return { known, total: cards.length };
+}
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+}
+function showHome() {
+  currentKey = null;
+  show("home");
+  renderModules();
+}
+function renderModules() {
+  const box = $("moduleList");
+  box.innerHTML = "";
+  Object.entries(defaultModules).forEach(([key,m]) => {
+    const s = progressStats(key);
+    const b = document.createElement("button");
+    b.className = "module";
+    b.onclick = () => openModule(key);
+    b.innerHTML = `<div class="module-title">${m.title}</div>
+                   <div class="module-count">${s.total} kártya · ${s.known}/${s.total} megtanulva</div>`;
+    box.appendChild(b);
+  });
+}
+function openModule(key) {
+  currentKey = key;
+  $("moduleTitle").textContent = defaultModules[key].title;
+  updateModuleProgress();
+  show("module");
+}
+function updateModuleProgress() {
+  const s = progressStats(currentKey);
+  $("moduleProgressText").textContent = `${s.known} / ${s.total} kártya megtanulva`;
+  $("moduleProgressBar").style.width = (s.total ? (s.known / s.total * 100) : 0) + "%";
+}
+
+function startStudy(shuffle = false) {
+  const cards = defaultModules[currentKey].cards;
+  cardOrder = cards.map((_, i) => i);
+
+  if (shuffle) {
+    cardOrder.sort(() => Math.random() - 0.5);
+  }
+
+  currentIndex = 0;
+  show("study");
+  renderCard();
+}
+
+function renderCard() {
+  const cards = defaultModules[currentKey].cards;
+  const originalIdx = cardOrder[currentIndex];
+  const card = cards[originalIdx];
+
+  $("cardContainer").classList.remove("flipped");
+  $("studyCounter").textContent = `${currentIndex + 1} / ${cardOrder.length}`;
+  $("cardNumber").textContent = `KÁRTYA ${originalIdx + 1}`;
+  $("question").textContent = card[0];
+  $("answer").textContent = card[1];
+
+  // Gombok tiltása a széleken
+  $("prevBtn").disabled = (currentIndex === 0);
+  $("prevBtn").style.opacity = (currentIndex === 0) ? "0.4" : "1";
+  
+  $("nextBtn").disabled = (currentIndex === cardOrder.length - 1);
+  $("nextBtn").style.opacity = (currentIndex === cardOrder.length - 1) ? "0.4" : "1";
+
+  // Megtanult állapot frissítése
+  updateMarkBtnState(originalIdx);
+
+  // Haladási sáv frissítése
+  const s = progressStats(currentKey);
+  $("studyProgressText").textContent = `Összesen megtanulva: ${s.known} / ${s.total}`;
+  $("studyProgressBar").style.width = (s.total ? (s.known / s.total * 100) : 0) + "%";
+}
+
+function toggleCardFlip() {
+  $("cardContainer").classList.toggle("flipped");
+}
+
+function nextCard() {
+  if (currentIndex < cardOrder.length - 1) {
+    currentIndex++;
+    renderCard();
+  }
+}
+
+function prevCard() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderCard();
+  }
+}
+
+function updateMarkBtnState(originalIdx) {
+  const p = getProgress(currentKey);
+  const isKnown = p[originalIdx] === true;
+  const btn = $("markBtn");
+
+  if (isKnown) {
+    btn.className = "btn-mark known";
+    btn.textContent = "✓ Megtanultnak jelölve";
+  } else {
+    btn.className = "btn-mark";
+    btn.textContent = "☐ Megtanultként megjelöl";
+  }
+}
+
+function toggleMarkKnown() {
+  const originalIdx = cardOrder[currentIndex];
+  const p = getProgress(currentKey);
+  
+  p[originalIdx] = !p[originalIdx];
+  saveProgress(currentKey, p);
+  
+  updateMarkBtnState(originalIdx);
+  updateModuleProgress();
+}
+
+function showModule() {
+  updateModuleProgress();
+  show("module");
+}
+
+function resetModule() {
+  if (confirm("Biztosan törlöd ennek a tantárgynak a mentett haladását?")) {
+    localStorage.removeItem(storageKey(currentKey));
+    updateModuleProgress();
+  }
+}
+
+renderModules();
+</script>
+</body>
+</html>

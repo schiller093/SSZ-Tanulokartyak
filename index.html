@@ -86,7 +86,7 @@
 
   .number { color:#777; font-size:14px; margin-bottom:14px; font-weight: 600; }
   .question { font-size:21px; line-height:1.4; font-weight:700; }
-  .answer { font-size:18px; line-height:1.55; color: #111827; }
+  .answer { font-size:17px; line-height:1.55; color: #111827; text-align: left; }
   
   /* Vezérlőgombok */
   .nav-controls {
@@ -134,7 +134,7 @@
   @media (max-width:520px) {
     h1 { font-size:24px; }
     .question { font-size:19px; }
-    .answer { font-size:16px; }
+    .answer { font-size:15px; }
     .card-container, .card-inner, .card-front, .card-back { min-height:350px; }
   }
 </style>
@@ -240,6 +240,38 @@ const defaultModules = {
       ["Mi a szerepe a rajzírásnak a gyakorlatvezetésben?", "Helytakarékos, gyors és vizuális áttekintést ad a komplett gyakorlatsorokról a pálcikafigurák segítségével."],
       ["Hogyan segít a gimnasztika a cselekvéstanulási folyamatban?", "Előkészíti az ízületeket és izmokat, valamint kiépíti az új mozgásminták alapjait a bonyolultabb sportági technikák előtt."]
     ]
+  },
+  uzletgazdasagtan: {
+    title: "Üzletgazdaságtan",
+    cards: [
+      ["Mi a szervezet definíciója?", "Emberek együttműködése/szövetkezése egy közös cél vagy feladat elérésére."],
+      ["Mi az üzleti vállalkozás definíciója és alapvető célja?", "Olyan emberi tevékenység, amelynek alapvető célja a fogyasztói igények kielégítése nyereség (profit) elérése mellett."],
+      ["Mi a vállalat definíciója?", "Az üzleti vállalkozás szervezeti és jogi kerete, ahol az alapvető cél eléréséhez szükséges tevékenységek végbemennek."],
+      ["Melyek a vállalat működésének fő jellemzői (a 4 pillér)?", "1. Önállóság: saját döntéseket hozhat.\n2. Profitérdekeltség: hosszú távú nyereséges működés.\n3. Kockázatvállalás: erőforrások/tőke befektetése bizonytalan jövő mellett.\n4. Valóságos piacon való megmérettetés: input- és outputárakat a piac határozza meg."],
+      ["Mi a különbség a szükséglet és a fogyasztói igény között?", "• Szükséglet: Az emberi lét fenntartásához egy adott kultúrában szükségesnek ítélt javak/szolgáltatások.\n• Fogyasztói igény: Fizetőképes kereslet a piacon (hajlandóság és képesség a megvásárlásra)."],
+      ["Mi a vállalat kettős értékteremtési folyamatának lényege?", "1. Fogyasztóknak: Hasznosság/érték teremtése a fogyasztói igények kielégítésével.\n2. Tulajdonosoknak: Profit/érték teremtése, amiért a tőkét befektetik."],
+      ["Mi a vállalat küldetése (mission)?", "Az alapvető cél konkrét értelmezése. Meghatározza a működési kört, a belső működési elveket és a külső érintettekkel való kapcsolatok alapelveit (megkülönböztetve a versenytársaktól)."],
+      ["Melyik két tényező elengedhetetlen a vállalat küldetésének megvalósításához?", "1. Marketing: A vállalat fogyasztóorientáltságát és piaci kapcsolatait megtestesítő szemlélet/funkció.\n2. Innováció: A fogyasztói igények új, magasabb szintű kielégítése."],
+      ["Milyen szintekből áll a vállalat tartalom szerinti célstruktúrája?", "1. Alapvető cél (purpose)\n2. Küldetés (mission)\n3. Távlati, tartós célok (objectives)\n4. Közvetlen irányítási célok (goals)\n5. Operatív működési célok (targets)"],
+      ["Kik a vállalat belső érintettjei és mi a fő céljuk?", "• Tulajdonosok: Tőkenövelés, vagyon- és eredmény-gyarapodás.\n• Menedzserek: Pozíció, hatalom, presztízs és jövedelem növelése.\n• Munkavállalók: Jobb munkafeltételek, magasabb jövedelem, jó munkahelyi légkör."],
+      ["Kik tartoznak a vállalat szűkebb és tágabb külső környezetéhez?", "• Szűkebb (közvetlen): Fogyasztók/vevők, Szállítók, Versenytársak, Stratégiai partnerek.\n• Tágabb (közvetett): Állami intézmények, helyi/állampolgári közösségek, természeti környezet."],
+      ["Mi a corporate governance (felelős vállalatirányítás) definíciója és feladata?", "Definíció: A vállalat legfelső szintű irányítását végző intézmények és mechanizmusok működése.\nFeladata: A szereplők (tulajdonos, menedzsment, munkavállaló) céljainak összehangolása, normák kialakítása, ellenőrzés."],
+      ["Mi hívta fel a figyelmet a felelős vállalatirányításra és mi lett a következménye?", "Az Enron-botrány (2001) hívta fel rá a figyelmet, ami az USA-ban a Sarbanes-Oxley törvényhez (2003) vezetett a szigorúbb ellenőrzés és transzparencia érdekében."],
+      ["Melyek az Angolszász vállalatkormányzási modell fő jellemzői?", "Egyszintű irányítás, széttagolt tulajdonosi szerkezet, független és belső tagokból álló Igazgatóság (Board of Directors), kulcsszereplő a CEO, munkavállalói beleszólás elhanyagolható."],
+      ["Melyek a Német vállalatkormányzási modell fő jellemzői?", "Kettős irányítás (Felügyelő Bizottság + Menedzsment Board), koncentráltabb tulajdon/bankok, erős dolgozói érdekvédelem (a Felügyelő Bizottság tagjainak 50%-át a munkavállalók delegálják)."],
+      ["Mi a neoklasszikus (mikroökonómiai) vállalatfelfogás lényege?", "A vállalat egy „fekete doboz”, teljesen racionális szereplő, amely tökéletes információk (árak) alapján dönt a profit maximalizálása érdekében."],
+      ["Mi a magatartási vállalatelmélet (March–Simon) lényege?", "A vállalat az érintettek koalíciója. A döntéshozók korlátozottan racionálisak, és optimalizálás helyett kielégítő megoldásra (aspirációs szintre) törekednek."],
+      ["Mi a megbízó–ügynök elmélet (Jensen–Meckling) lényege?", "A tulajdonos (megbízó) és a menedzser (ügynök) közötti érdekütközést vizsgálja, amelynek alapja az információs aszimmetria és az opportunista viselkedés. Megoldás: ösztönzési rendszerek."],
+      ["Mi a tranzakciós költség elmélet (Williamson) lényege?", "A piacon lebonyolított tranzakcióknak költsége van. A vállalat addig terjeszti ki belső szervezetét, amíg a belső koordináció költsége alacsonyabb a piaci tranzakciós költségnél."],
+      ["Mi az erőforrás-alapú vállalatelmélet (Wernerfelt) lényege?", "A vállalatok egyedi, nehezen másolható erőforrásai és belső képességei határozzák meg a tartós piaci versenyelőnyt."],
+      ["Mi a különbség a jól és a rosszul strukturált döntések között?", "• Jól strukturált: Rutinszerűek, ismétlődők, egyértelmű eljárások vonatkoznak rájuk.\n• Rosszul strukturált: Újszerűek, bizonytalanok, hiányos információkon alapulnak, egyedi mérlegelést igényelnek."],
+      ["Melyek a döntési folyamat szakaszai?", "1. Probléma felismerése/megfogalmazása\n2. Döntési kritériumok meghatározása/súlyozása\n3. Alternatívák kidolgozása\n4. Alternatívák értékelése\n5. Választás\n6. Végrehajtás és visszacsatolás"],
+      ["Mi a PESTEL-elemzés lényege és mit jelent a betűszó?", "A makrokörnyezet elemzése. Elemei:\nPolitical (Politikai), Economic (Gazdasági), Socio-cultural (Társadalmi), Technological (Technológiai), Environmental (Környezeti), Legal (Jogi)."],
+      ["Melyek Porter 5 tényezős iparági környezeti modelljének elemei?", "1. Iparági versenytársak közötti rivalizálás\n2. Új belépők fenyegetése\n3. Helyettesítő termékek fenyegetése\n4. Vevők alkupozíciója\n5. Szállítók alkupozíciója"],
+      ["Hogyan épül fel a SWOT-analízis és mit jelent a VRIO keretrendszer?", "• SWOT: Belső (Strengths, Weaknesses) és Külső (Opportunities, Threats) tényezők.\n• VRIO: Belső erőforrások vizsgálata (Valuable, Rare, Inimitable, Organized) a tartós versenyelőnyért."],
+      ["Melyek Porter alapvető (generikus) versenystratégiái?", "1. Költségvezető stratégia (alacsony költségek széles piacon)\n2. Megkülönböztető/differenciáló stratégia (egyedi minőség széles piacon)\n3. Fókuszáló/réspiac stratégia (szűk piaci szegmens kiszolgálása)"],
+      ["Melyek a 4P, a +3P és az STP marketing elemei?", "• STP: Segmentation (Szegmentálás), Targeting (Célpiac-választás), Positioning (Pozicionálás)\n• 4P: Product, Price, Place, Promotion\n• +3P: People, Process, Physical Evidence"]
+    ]
   }
 };
 
@@ -319,7 +351,7 @@ function renderCard() {
   $("studyCounter").textContent = `${currentIndex + 1} / ${cardOrder.length}`;
   $("cardNumber").textContent = `KÁRTYA ${originalIdx + 1}`;
   $("question").textContent = card[0];
-  $("answer").textContent = card[1];
+  $("answer").innerHTML = card[1].replace(/\n/g, "<br>");
 
   // Gombok tiltása a széleken
   $("prevBtn").disabled = (currentIndex === 0);
